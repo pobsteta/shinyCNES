@@ -1,23 +1,4 @@
 globalVariables(c(
   "volumes",
-  "treeID",
-  "project_dir",
-  "placette_dir",
-  "res",
-  "ids",
-  "x", "y",
-  "X", "Y",
-  "DBH", "Diam",
-  "H_tot", "H_tot2",
-  "nn.idx", "dist",
-  "classe", "rmsxy",
-  "i", "h", "idx",
-  "Z", "species",
-  ".", "rv", "pp",
-  "r", "geometry",
-  "Ht",
-  "buffer",
-  "Intensity",
-  "SAMPLE",
-  "data"
+  "project_dir"
 ))

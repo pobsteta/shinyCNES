@@ -12,23 +12,24 @@
 #'
 #' @keywords internal
 #' @export
-#' @importFrom shiny NS tagList
+#' @importFrom shiny NS tagList htmlOutput
 #' @importFrom shiny.i18n Translator
 #' @importFrom shinyFiles shinyDirButton
+#' @importFrom htmltools div
+#' @importFrom shinydashboard box
 #'
 mod_project_ui <- function(id) {
   ns <- NS(id)
 
-  i18n <- Translator$new(translation_json_path = "./inst/translations/translation.json")
+  i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
 
   tagList(
-    tabName = "project",
+    tabName = "product",
     h3(i18n$t("Project options")),
     fluidRow(
       box(
         title = i18n$t("Project"),
-        # title = textOutput(ns("title_project")),
         status = "primary",
         solidHeader = TRUE,
         collapsible = TRUE,
@@ -77,50 +78,30 @@ mod_project_ui <- function(id) {
 #' @keywords internal
 #' @importFrom shiny.i18n Translator
 #' @importFrom shiny updateTextInput
-#' @importFrom shinyFiles getVolumes shinyDirChoose
+#' @importFrom shinyFiles getVolumes shinyDirChoose parseDirPath
 #' @importFrom stats na.omit
-
+#' @importFrom stringr str_extract
+#' @importFrom magrittr %>%
+#' 
 mod_project_server <- function(input, output, session, rv) {
   ns <- session$ns
 
   volumes <- c("Home" = path.expand("~"), shinyFiles::getVolumes()())
 
-  observe({
-    shinyDirChoose(
+  shinyDirChoose(
       input,
       "path_project_sel",
       roots = volumes,
       session = session
-    )
-  })
+  )
 
   observe({
     rv$project_name <- input$project_name
   })
 
   observe({
-    rv$path_project <- parseDirPath(volumes, input$path_project_sel)
-    updateTextInput(session = session, "path_project_textin", value = parseDirPath(volumes, input$path_project_sel))
-  })
-
-  observeEvent(c(input$project_name, input$path_project_textin), {
-    rv$project_name <- input$project_name
-    rv$path_project <- input$path_project_textin
-    rv$path_data <- file.path(input$path_project_textin, input$project_name, "data")
-    if (nchar(rv$path_data) > 6) {
-      # get plot directory
-      rv$nom <- stringr::str_extract(
-        tools::file_path_sans_ext(
-          basename(
-            list.files(rv$path_data, pattern = "gpkg$", full.names = TRUE)
-          )
-        ),
-        "[a-zA-Z]{2}_[0-9]+"
-      ) %>%
-        na.omit() %>%
-        data.frame()
-      updateSelectInput(session, "plotin", choices = c("Choisir" = "", rv$nom))
-    }
+    rv$path_project <- shinyFiles::parseDirPath(volumes, input$path_project_sel)
+    updateTextInput(session = session, "path_project_textin", value = shinyFiles::parseDirPath(volumes, input$path_project_sel))
   })
 
   observe({
