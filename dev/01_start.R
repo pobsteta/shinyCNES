@@ -38,7 +38,7 @@ usethis::use_news_md( open = FALSE )
 usethis::use_git()
 
 ## If you have data in your package
-usethis::use_data_raw( name = "data-test", open = FALSE )
+usethis::use_data_raw( name = "datatest", open = FALSE )
 
 ## Init Testing Infrastructure ----
 ## Create a template for tests
