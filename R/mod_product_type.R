@@ -14,6 +14,8 @@ mod_product_type_ui <- function(id){
   i18n$set_translation_language("fr")
   
   tagList(
+    tabName = "product",
+    h3(i18n$t("Product options")),
     fluidRow(
       box(
         title = i18n$t("Type of products"),
@@ -22,7 +24,7 @@ mod_product_type_ui <- function(id){
         collapsible = TRUE,
         width = 12,
         radioButtons(
-          "product", NULL,
+          ns("product"), NULL,
           choiceNames = list(
             span(
               i18n$t("THEIA product "),
@@ -55,7 +57,11 @@ mod_product_type_ui <- function(id){
 #' @noRd 
 mod_product_type_server <- function(input, output, session, rv){
   ns <- session$ns
- 
+  
+  # observe({
+  #   rv$product <- input$product
+  # })
+  # 
 }
     
 ## To be copied in the UI

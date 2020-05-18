@@ -23,9 +23,9 @@ mod_collection_type_ui <- function(id){
         width = 12,
         ### theia ###
         conditionalPanel(
-          condition = "input.product == 'theia'",
+          condition = sprintf("input['%s'] == 'theia'", ns("product")),
           radioButtons(
-            "theiacollection", NULL,
+            ns("theiacollection"), NULL,
             choiceNames = list(
               span(
                 a("Landsat",
@@ -66,9 +66,10 @@ mod_collection_type_ui <- function(id){
         
         ### peps ###
         conditionalPanel(
-          condition = "input.product == 'peps'",
+          condition = sprintf("input['%s'] == 'peps'", ns("product")),
+          # condition = "input.product == 'peps'",
           radioButtons(
-            "pepscollection", NULL,
+            ns("pepscollection"), NULL,
             choiceNames = list(
               span(
                 a("S1",
@@ -110,6 +111,11 @@ mod_collection_type_ui <- function(id){
 #' @noRd 
 mod_collection_type_server <- function(input, output, session, rv){
   ns <- session$ns
+  
+  # observe({
+  #   rv$theiacollection <- input$theiacollection
+  #   rv$pepscollection <- input$pepscollection
+  # })
  
 }
     

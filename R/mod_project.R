@@ -86,27 +86,20 @@ mod_project_ui <- function(id) {
 mod_project_server <- function(input, output, session, rv) {
   ns <- session$ns
 
-  volumes <- c("Home" = path.expand("~"), shinyFiles::getVolumes()())
+  # volumes <- c("Home" = path.expand("~"), shinyFiles::getVolumes()())
+  volumes <- c(shinyFiles::getVolumes()())
 
   shinyDirChoose(
-      input,
-      "path_project_sel",
-      roots = volumes,
-      session = session
+    input,
+    id = "path_project_sel",
+    roots = volumes,
+    session = session
   )
-
-  observe({
-    rv$project_name <- input$project_name
-  })
-
-  observe({
-    rv$path_project <- shinyFiles::parseDirPath(volumes, input$path_project_sel)
+  
+  observeEvent(input$path_project_sel , {
     updateTextInput(session = session, "path_project_textin", value = shinyFiles::parseDirPath(volumes, input$path_project_sel))
   })
 
-  observe({
-    output$path_project_errorness <- path_check(input$path_project_textin)
-  })
 }
 
 ## To be copied in the UI

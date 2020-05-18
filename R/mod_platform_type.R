@@ -17,7 +17,7 @@ mod_platform_type_ui <- function(id){
     fluidRow(
       #### LANDSAT ####
       conditionalPanel(
-        condition = "input.product == 'theia' && input.theiacollection == 'landsat'",
+        condition = sprintf("input['%s'] == 'theia' && input['%s'] == 'landsat'", ns("product"), ns("theiacollection")),
         box(
           title = i18n$t("Type of platform"),
           status = "primary",
@@ -25,7 +25,7 @@ mod_platform_type_ui <- function(id){
           collapsible = TRUE,
           width = 12,
           radioButtons(
-            "theiaplatformlandsat", NULL,
+            ns("theiaplatformlandsat"), NULL,
             choiceNames = list(
               span(
                 a("LANDSAT5",
@@ -54,7 +54,7 @@ mod_platform_type_ui <- function(id){
       ), # end conditionalpanel
       #### SPOTWORLDHERITAGE ####
       conditionalPanel(
-        condition = "input.product == 'theia' && input.theiacollection == 'spotworldheritage'",
+        condition = sprintf("input['%s'] == 'theia' && input['%s'] == 'spotworldheritage'", ns("product"), ns("theiacollection")),
         box(
           title = i18n$t("Type of platform"),
           status = "primary",
@@ -62,7 +62,7 @@ mod_platform_type_ui <- function(id){
           collapsible = TRUE,
           width = 12,
           radioButtons(
-            "theiaplatformspotworldheritage", NULL,
+            ns("theiaplatformspotworldheritage"), NULL,
             choiceNames = list(
               span(
                 a("SPOT1",
@@ -103,7 +103,7 @@ mod_platform_type_ui <- function(id){
       ), # end conditionalPanel
       #### SENTINEL2 ####
       conditionalPanel(
-        condition = "input.product == 'theia' && input.theiacollection == 'sentinel2'",
+        condition = sprintf("input['%s'] == 'theia' && input['%s'] == 'sentinel2'", ns("product"), ns("theiacollection")),
         box(
           title = i18n$t("Type of platform"),
           status = "primary",
@@ -111,7 +111,7 @@ mod_platform_type_ui <- function(id){
           collapsible = TRUE,
           width = 12,
           radioButtons(
-            "theiaplatformsentinel", NULL,
+            ns("theiaplatformsentinel"), NULL,
             choiceNames = list(
               span(
                 a("SENTINEL2A",
@@ -134,7 +134,7 @@ mod_platform_type_ui <- function(id){
       ), # end conditionalpanel
       #### VENUS ####
       conditionalPanel(
-        condition = "input.product == 'theia' && input.theiacollection == 'venus'",
+        condition = sprintf("input['%s'] == 'theia' && input['%s'] == 'venus'", ns("product"), ns("theiacollection")),
         box(
           title = i18n$t("Type of platform"),
           status = "primary",
@@ -142,7 +142,7 @@ mod_platform_type_ui <- function(id){
           collapsible = TRUE,
           width = 12,
           radioButtons(
-            "theiaplatformvenus", NULL,
+            ns("theiaplatformvenus"), NULL,
             choiceNames = list(
               span(
                 a("VENUS",
@@ -166,6 +166,13 @@ mod_platform_type_ui <- function(id){
 #' @noRd 
 mod_platform_type_server <- function(input, output, session, rv){
   ns <- session$ns
+  
+  observe({
+    rv$theiaplatformlandsat <- input$theiaplatformlandsat
+    rv$theiaplatformspotworldheritage <- input$theiaplatformspotworldheritage
+    rv$theiaplatformsentinel <- input$theiaplatformsentinel
+    rv$theiaplatformvenus <- input$theiaplatformvenus
+  })
  
 }
     

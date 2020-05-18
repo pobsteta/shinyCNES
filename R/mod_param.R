@@ -70,9 +70,11 @@ mod_param_ui <- function(id) {
 #' @importFrom jsonlite toJSON
 #' @importFrom shiny updateTextInput withProgress NS
 #' @importFrom shinyFiles parseFilePaths shinyFileSave parseSavePath getVolumes
-
+#'
 mod_param_server <- function(input, output, session, rv) {
   ns <- session$ns
+  
+  rv$out <- FALSE
 
   volumes <- c("Home" = path.expand("~"), shinyFiles::getVolumes()())
 
@@ -121,18 +123,9 @@ mod_param_server <- function(input, output, session, rv) {
       NULL
     }
     if (!is.null(rv$imported_param)) {
-      import_param_list(session = session, rv = rv$imported_param)
+      out <- import_param_list(session = session, rv = rv$imported_param)
     }
-  })
-
-  observeEvent(input$resolution, {
-    rv$resolution <- input$resolution
-    print(paste("param resolution:", rv$resolution))
-  })
-
-  observeEvent(input$plotin, {
-    rv$plot_in <- input$plotin
-    print(paste("param plotin:", rv$plot_in))
+    rv$imported_param <- NULL
   })
 
   # if Exit is pressend, exit from GUI
@@ -144,6 +137,7 @@ mod_param_server <- function(input, output, session, rv) {
   session$onSessionEnded(function() {
     stopApp()
   })
+  return (rv)
 }
 
 ## To be copied in the UI

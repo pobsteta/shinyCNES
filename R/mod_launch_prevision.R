@@ -34,7 +34,7 @@ mod_launch_prevision_ui <- function(id){
             ),
             div(
               style = "display:inline-block;vertical-align:top;width:calc(100% - 50pt - 3px);",
-              verbatimTextOutput("project_name_verbatim")
+              verbatimTextOutput(ns("project_name_verbatim"))
             )
           ) # end of span
         ), # end of column
@@ -46,16 +46,16 @@ mod_launch_prevision_ui <- function(id){
           ),
           div(
             style = "display:inline-block;vertical-align:top;",
-            htmlOutput("path_model_errormess")
+            htmlOutput(ns("path_model_errormess"))
           ),
           div(
             div(
               style = "display:inline-block;vertical-align:top;width:50pt;",
-              shinyDirButton("path_model_sel", "Select", i18n$t("Specify directory for the model"))
+              shinyDirButton(ns("path_model_sel"), "Select", i18n$t("Specify directory for the model"))
             ),
             div(
               style = "display:inline-block;vertical-align:top;width:calc(99% - 50pt - 3px);",
-              textInput("path_model_textin", NULL, "")
+              textInput(ns("path_model_textin"), NULL, "")
             )
           )
         ),
@@ -70,8 +70,8 @@ mod_launch_prevision_ui <- function(id){
             div(
               style = "padding-top:5px;padding-bottom:10px;",
               actionButton(
-                "button_refresh_map_prevision",
-                label = i18n$t("\u2000Reload the extent on map"),
+                ns("button_refresh_map_prevision"),
+                label = i18n$t("\u2000Reload map extent"),
                 width = 176,
                 icon = icon("retweet")
               )
@@ -79,7 +79,7 @@ mod_launch_prevision_ui <- function(id){
           ) # end of span
         ), # end of column
         # Map
-        leafletOutput("view_map_prevision", height = 800, width = "100%")
+        leafletOutput(ns("view_map_prevision"), height = 800, width = "100%")
       ) # end of box
     ) # end of fluidrow
   ) # end taglist

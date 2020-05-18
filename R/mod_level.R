@@ -17,7 +17,7 @@ mod_level_ui <- function(id){
     fluidRow(
       #### SENTINEL2 ####
       conditionalPanel(
-        condition = "input.product == 'theia' && input.theiacollection == 'sentinel2'",
+        condition = sprintf("input['%s'] == 'theia' && input['%s'] == 'sentinel2'", ns("product"), ns("theiacollection")),
         box(
           title = i18n$t("Level"),
           status = "primary",
@@ -25,7 +25,7 @@ mod_level_ui <- function(id){
           collapsible = TRUE,
           width = 12,
           radioButtons(
-            "theiaplatformsentinellevel", NULL,
+            ns("theiaplatformsentinellevel"), NULL,
             choiceNames = list(
               span(
                 a("LEVEL1C",
@@ -61,6 +61,10 @@ mod_level_ui <- function(id){
 #' @noRd 
 mod_level_server <- function(input, output, session, rv){
   ns <- session$ns
+  
+  # observe({
+  #   rv$theiaplatformsentinellevel <- input$theiaplatformsentinellevel
+  # })
  
 }
     

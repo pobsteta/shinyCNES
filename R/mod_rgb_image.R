@@ -23,11 +23,11 @@ mod_rgb_image_ui <- function(id){
         solidHeader = TRUE,
         collapsible = TRUE,
         width = 12,
-        uiOutput("checkbox_list_rgb"),
+        uiOutput(ns("checkbox_list_rgb")),
         div(
           style = "display:inline-block;padding-top:10px;padding-right:10px;",
           actionButton(
-            "new_rgb",
+            ns("new_rgb"),
             label = "\u2000Define custom RGB image",
             icon = icon("plus")
           )
@@ -35,7 +35,7 @@ mod_rgb_image_ui <- function(id){
         div(
           style = "display:inline-block;padding-top:10px;",
           actionButton(
-            "rm_rgb",
+            ns("rm_rgb"),
             label = "\u2000Remove unselected RGB from list",
             icon = icon("trash-alt")
           )

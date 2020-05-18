@@ -29,10 +29,10 @@ mod_launch_processing_ui <- function(id){
           solidHeader = TRUE,
           collapsible = TRUE,
           width = 4,
-          selectInput("listimage01", i18n$t("Tiles downloaded:"), c("No tile" = "")),
+          selectInput(ns("listimage01"), i18n$t("Tiles downloaded:"), c("No tile" = "")),
           div(
             style = "display:inline-block;horizontal-align:center;",
-            imageOutput("image01", height = 500, width = 500)
+            imageOutput(ns("image01"), height = 500, width = 500)
           ) # end div
         ), # end box
         box(
@@ -41,10 +41,10 @@ mod_launch_processing_ui <- function(id){
           solidHeader = TRUE,
           collapsible = TRUE,
           width = 4,
-          selectInput("listimage02", i18n$t("Tiles RGB:"), c("No tile" = "")),
+          selectInput(ns("listimage02"), i18n$t("Tiles RGB:"), c("No tile" = "")),
           div(
             style = "display:inline-block;horizontal-align:center;",
-            imageOutput("image02", height = 500, width = 500)
+            imageOutput(ns("image02"), height = 500, width = 500)
           ) # end div
         ), # end box
         box(
@@ -53,7 +53,7 @@ mod_launch_processing_ui <- function(id){
           solidHeader = TRUE,
           collapsible = TRUE,
           width = 4,
-          selectInput("listimage03", i18n$t("Tiles indice:"), c("No tile" = "")),
+          selectInput(ns("listimage03"), i18n$t("Tiles indice:"), c("No tile" = "")),
           div(
             style = "display:inline-block;horizontal-align:center;",
             imageOutput("image03", height = 500, width = 500)
@@ -84,20 +84,14 @@ mod_launch_processing_ui <- function(id){
               div(
                 style = "padding-top:5px;padding-bottom:10px;",
                 actionButton(
-                  "button_extent_vectfile_pa",
-                  label = i18n$t("\u2000Load a vector file"),
+                  ns("button_extent_vectfile_pa"),
+                  label = i18n$t("\u2000Load a gpkg file"),
                   width = 176,
                   icon = icon("upload")
                 ),
-                # actionButton(
-                #   "button_extent_draw_pa",
-                #   label = i18n$t("\u2000Draw it on the map"),
-                #   width = 176,
-                #   icon = icon("paint-brush")
-                # ),
                 actionButton(
-                  "button_refresh_map_pa",
-                  label = i18n$t("\u2000Reload the extent on map"),
+                  ns("button_refresh_map_pa"),
+                  label = i18n$t("\u2000Reload map extent"),
                   width = 176,
                   icon = icon("retweet")
                 )
@@ -105,7 +99,7 @@ mod_launch_processing_ui <- function(id){
             ) # end of span
           ), # end of column
           # Map presence/absence
-          leafletOutput("view_map_presabs", height = 500, width = "100%")
+          leafletOutput(ns("view_map_presabs"), height = 500, width = "100%")
         ), # end box
         box(
           title = i18n$t("Tiles TIF"),
@@ -113,10 +107,10 @@ mod_launch_processing_ui <- function(id){
           solidHeader = TRUE,
           collapsible = TRUE,
           width = 4,
-          selectInput("listimage04", i18n$t("Tiles TIF:"), c("No tile" = "")),
+          selectInput(ns("listimage04"), i18n$t("Tiles TIF:"), c("No tile" = "")),
           div(
             style = "display:inline-block;horizontal-align:center;",
-            imageOutput("image04", height = 500, width = 500)
+            imageOutput(ns("image04"), height = 500, width = 500)
           ) # end div
         ), # end box
         box(
@@ -134,20 +128,14 @@ mod_launch_processing_ui <- function(id){
               div(
                 style = "padding-top:5px;padding-bottom:10px;",
                 actionButton(
-                  "button_extent_vectfile_mask",
-                  label = i18n$t("\u2000Load a vector file"),
+                  ns("button_extent_vectfile_mask"),
+                  label = i18n$t("\u2000Load a gpkg file"),
                   width = 176,
                   icon = icon("upload")
                 ),
-                # actionButton(
-                #   "button_extent_draw_mask",
-                #   label = i18n$t("\u2000Draw it on the map"),
-                #   width = 176,
-                #   icon = icon("paint-brush")
-                # ),
                 actionButton(
-                  "button_refresh_map_mask",
-                  label = i18n$t("\u2000Reload the extent on map"),
+                  ns("button_refresh_map_mask"),
+                  label = i18n$t("\u2000Reload map extent"),
                   width = 176,
                   icon = icon("retweet")
                 )
@@ -155,12 +143,12 @@ mod_launch_processing_ui <- function(id){
             ) # end of span
           ), # end of column
           # Map presence/absence
-          leafletOutput("view_map_mask", height = 500, width = "100%")
+          leafletOutput(ns("view_map_mask"), height = 500, width = "100%")
         ) # end box
       ) # end box
     ), # end fluidrow 2
     br(),
-    column(12, textOutput("text00"))
+    column(12, textOutput(ns("text00")))
   ) # end tabitem tab_launch_processing
 }
     

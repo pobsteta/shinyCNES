@@ -28,64 +28,58 @@ app_ui <- function(request) {
       ),
       sidebar = dashboardSidebar(
         sidebarMenu(
-          menuItem("Product selection", tabName = "product", icon = icon("gears"))
-          # menuItem("Processing selection", tabName = "opt_processing", icon = icon("gears")),
-          # menuItem("Spatio-temporal selection", tabName = "query", icon = icon("clone")),
-          # menuItem("Spectral indices selection", tabName = "index", icon = icon("calculator")),
-          # menuItem("RGB images selection", tabName = "rgb", icon = icon("calculator")),
-          # menuItem("Processing result", tabName = "launch_processing", icon = icon("refresh")),
-          # menuItem("Prevision result", tabName = "launch_prevision", icon = icon("calendar"))
-          # menuItem("Sampling", tabName = "sampling", icon = icon("wpexplorer")),
-          # menuItem("Retiming", tabName = "retiming", icon = icon("map-marked-alt"))
-          # menuItem("Exploration", tabName = "exploration", icon = icon("dashboard")),
-          # menuItem("Filtrer", tabName = "filtrer", icon = icon("th")),
-          # menuItem("Remplacer", tabName = "remplacer", icon = icon("plus-circle")),
-          # menuItem("Exporter", tabName = "exporter", icon = icon("briefcase"))
+          menuItem("Project selection", tabName = "project", icon = icon("gears")),
+          menuItem("Product selection", tabName = "product", icon = icon("gears")),
+          menuItem("Processing selection", tabName = "opt_processing", icon = icon("gears")),
+          menuItem("Spectral indices selection", tabName = "index", icon = icon("calculator")),
+          menuItem("RGB images selection", tabName = "rgb", icon = icon("calculator")),
+          menuItem("Processing result", tabName = "launch_processing", icon = icon("refresh")),
+          menuItem("Prevision result", tabName = "launch_prevision", icon = icon("calendar"))
         )
       ),
       body = dashboardBody(
         tabItems(
           # First tab content
           tabItem(
-            tabName = "product",
-            mod_project_ui("product")
-            # mod_product_type_ui("product"),
-            # mod_collection_type_ui("product"),
-            # mod_platform_type_ui("product"),
-            # mod_level_ui("product")
+            tabName = "project",
+            mod_project_ui("product"),
+            mod_temporal_map_ui("product")
           ),
           # tab 2
           tabItem(
-            tabName = "opt_processing",
-            # mod_save_options_ui("process"),
-            # mod_cloud_mask_ui("process"),
-            # mod_processing_options_ui("process")
+            tabName = "product",
+            mod_product_type_ui("product"),
+            mod_collection_type_ui("product"),
+            mod_platform_type_ui("product"),
+            mod_level_ui("product")
           ),
           # tab 3
           tabItem(
-            tabName = "query",
-            # mod_temporal_parameters_ui("query"),
-            # mod_temporal_map_ui("query")
+            tabName = "opt_processing",
+            mod_save_options_ui("product"),
+            mod_temporal_parameters_ui("product"),
+            mod_cloud_mask_ui("product"),
+            mod_processing_options_ui("product")
           ),
           # tab 4
           tabItem(
             tabName = "index",
-            # mod_spectral_indice_ui("index")
+            mod_spectral_indice_ui("product")
           ),
           # tab 5
           tabItem(
             tabName = "rgb",
-            # mod_rgb_image_ui("rgb")
+            mod_rgb_image_ui("rgb")
           ),
           # tab 6
           tabItem(
             tabName = "launch_processing",
-            # mod_launch_processing_ui("launch_processing")
+            mod_launch_processing_ui("launch_processing")
           ),
           # tab 7
           tabItem(
             tabName = "launch_prevision",
-            # mod_launch_prevision_ui("launch_prevision")
+            mod_launch_prevision_ui("launch_prevision")
           )
         )
       ),
@@ -94,8 +88,8 @@ app_ui <- function(request) {
         rightSidebarTabContent(
           id = 1,
           icon = "map-marked-alt",
-          active = TRUE
-          # mod_param_ui("param")
+          active = TRUE,
+          mod_param_ui("product")
         )
       ),
       footer = dashboardFooter(
