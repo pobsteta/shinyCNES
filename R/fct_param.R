@@ -301,7 +301,7 @@ create_return_list <- function(rv) {
   rl$n_cores <- rv$n_cores
   # temporal parameters ####
   rl$query_time <- rv$query_time
-  # spatio-temporal selection #
+  # spatio-temporal selection ####
   rl$timewindow <- if (rv$query_time == TRUE) { # range of dates
     rv$timewindow
   } else {
@@ -312,7 +312,7 @@ create_return_list <- function(rv) {
   } else {
     "full"
   }
- 
+
   # polygon extent
   rl$extent <- if (!is.null(rv$extent) & !is.na(rv$extent)) {
     rv$extent %>%
@@ -321,18 +321,21 @@ create_return_list <- function(rv) {
   } else {
     NA
   }
-  # selected tile IDs
-  rl$s2tiles_selected <- if (rv$query_space == TRUE & length(nn(rv$tiles_checkbox)>0)) {
-    rv$tiles_checkbox
-  } else {
-    NA
-  } 
-  # selected orbit IDs
-  rl$s2orbits_selected <- if (rv$query_space == TRUE & length(nn(rv$orbits_checkbox)>0)) {
-    rv$orbits_checkbox
-  } else {
-    NA
-  } 
+  # # selected tile IDs
+  # rl$s2tiles_selected <- if (rv$query_space == TRUE & length(nn(rv$tiles_checkbox)>0)) {
+  #   rv$tiles_checkbox
+  # } else {
+  #   NA
+  # }
+  # # selected orbit IDs
+  # rl$s2orbits_selected <- if (rv$query_space == TRUE & length(nn(rv$orbits_checkbox)>0)) {
+  #   rv$orbits_checkbox
+  # } else {
+  #   NA
+  # }
+  
+  # spectral indices and RGB images
+  # rl$list_indices <- rv$list_indices
 
   return(rl)
 }

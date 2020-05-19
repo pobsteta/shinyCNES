@@ -85,6 +85,12 @@ mod_project_ui <- function(id) {
 #' 
 mod_project_server <- function(input, output, session, rv) {
   ns <- session$ns
+  
+  # for save parameters
+  observe({
+    rv$project_name <- input$project_name
+    rv$path_project <- input$path_project_textin
+  })
 
   # volumes <- c("Home" = path.expand("~"), shinyFiles::getVolumes()())
   volumes <- c(shinyFiles::getVolumes()())

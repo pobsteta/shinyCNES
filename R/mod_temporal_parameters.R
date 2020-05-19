@@ -78,6 +78,13 @@ mod_temporal_parameters_ui <- function(id){
 mod_temporal_parameters_server <- function(input, output, session, rv){
   ns <- session$ns
   
+  # for save parameters
+  observe({
+    rv$query_time <- input$query_time
+    rv$timewindow <- input$timewindow
+    rv$timeperiod <- input$timeperiod
+  })
+  
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
   

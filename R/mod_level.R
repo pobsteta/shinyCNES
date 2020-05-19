@@ -62,9 +62,10 @@ mod_level_ui <- function(id){
 mod_level_server <- function(input, output, session, rv){
   ns <- session$ns
   
-  # observe({
-  #   rv$theiaplatformsentinellevel <- input$theiaplatformsentinellevel
-  # })
+  # for save parameters
+  observe({
+    rv$theiaplatformsentinellevel <- input$theiaplatformsentinellevel
+  })
  
 }
     

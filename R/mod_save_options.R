@@ -102,6 +102,12 @@ mod_save_options_ui <- function(id){
 mod_save_options_server <- function(input, output, session, rv){
   ns <- session$ns
   
+  # for save parameters
+  observe({
+    rv$online <- input$online
+    rv$overwrite_product <- input$overwrite_product
+  })
+  
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
   

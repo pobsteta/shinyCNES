@@ -139,6 +139,17 @@ mod_cloud_mask_ui <- function(id){
 mod_cloud_mask_server <- function(input, output, session, rv){
   ns <- session$ns
   
+  # for save parameters
+  observe({
+    rv$atm_mask <- input$atm_mask
+    rv$atm_mask_type <- input$atm_mask_type
+    rv$atm_mask_custom <- input$atm_mask_custom
+    rv$max_masked_perc <- input$max_masked_perc
+    rv$mask_apply_smooth <- input$mask_apply_smooth
+    rv$mask_smooth <- input$mask_smooth
+    rv$mask_buffer <- input$mask_buffer
+  })
+  
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
   

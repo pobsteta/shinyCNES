@@ -167,6 +167,7 @@ mod_platform_type_ui <- function(id){
 mod_platform_type_server <- function(input, output, session, rv){
   ns <- session$ns
   
+  # for save parameters
   observe({
     rv$theiaplatformlandsat <- input$theiaplatformlandsat
     rv$theiaplatformspotworldheritage <- input$theiaplatformspotworldheritage

@@ -112,10 +112,11 @@ mod_collection_type_ui <- function(id){
 mod_collection_type_server <- function(input, output, session, rv){
   ns <- session$ns
   
-  # observe({
-  #   rv$theiacollection <- input$theiacollection
-  #   rv$pepscollection <- input$pepscollection
-  # })
+  # for save parameters
+  observe({
+    rv$theiacollection <- input$theiacollection
+    rv$pepscollection <- input$pepscollection
+  })
  
 }
     

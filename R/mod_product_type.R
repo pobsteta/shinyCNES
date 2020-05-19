@@ -58,10 +58,11 @@ mod_product_type_ui <- function(id){
 mod_product_type_server <- function(input, output, session, rv){
   ns <- session$ns
   
-  # observe({
-  #   rv$product <- input$product
-  # })
-  # 
+  # for save parameters
+  observe({
+    rv$product <- input$product
+  })
+
 }
     
 ## To be copied in the UI

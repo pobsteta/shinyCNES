@@ -124,6 +124,7 @@ mod_param_server <- function(input, output, session, rv) {
     }
     if (!is.null(rv$imported_param)) {
       out <- import_param_list(session = session, rv = rv$imported_param)
+      # rv$extent <- rv$imported_param$extent
     }
     rv$imported_param <- NULL
   })
