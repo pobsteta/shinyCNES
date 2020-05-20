@@ -95,7 +95,7 @@ mod_temporal_map_ui <- function(id){
                     i18n$t("Orbits selected\u2000"),
                     actionLink(ns("help_orbits"), icon("question-circle"))
                   ),
-                  choices = str_pad2(1:143, 3, "left", "0"),
+                  choices = paste0("O", str_pad2(1:143, 3, "left", "0")),
                   options = list(
                     `selected-text-format` = "count > 10",
                     `live-search` = TRUE,
@@ -110,7 +110,14 @@ mod_temporal_map_ui <- function(id){
               width = 12,
               # Map
               leaflet::leafletOutput(ns("view_map_extent"), height = 600, width = "100%"),
-              textInput(ns("list_tiles"), label = "")
+              column(
+                width = 6,
+                textInput(ns("list_tiles"), label = "")
+              ),
+              column(
+                width = 6,
+                textInput(ns("list_orbits"), label = "")
+              )
             ) # end of column
         ) # end of fluidrow
       ) # end of box
@@ -131,6 +138,13 @@ mod_temporal_map_server <- function(input, output, session, rv){
   
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
+  
+  # for save parmeters
+  observe({
+    rv$query_space <- input$query_space
+    rv$tiles_checkbox <- input$tiles_checkbox
+    rv$orbits_checkbox <- input$orbits_checkbox
+  })
 
   # create a new map for extent view
   react_map <- reactiveVal({
@@ -139,7 +153,7 @@ mod_temporal_map_server <- function(input, output, session, rv){
     addLayersControl(
       basemap,
       baseGroups = c("OpenStreetMap", "OpenTopoMap", "Satellite"),
-      overlayGroups = c("Light names", "Dark names", "S2 tiles", "Extent"),
+      overlayGroups = c("Light names", "Dark names", "S2 tiles", "S2 orbits", "Extent"),
       options = layersControlOptions(collapsed = TRUE)
     )
   })
@@ -302,6 +316,51 @@ mod_temporal_map_server <- function(input, output, session, rv){
     })
   })
   
+  #- Update orbit colours when single orbits are [de]activated -#
+  observeEvent(input$orbits_checkbox, ignoreNULL = FALSE, {
+    if (!is.null(input$orbits_checkbox)) {
+      rv$draw_orbits_overlapping_selected <- rv$s2orbits %>% dplyr::filter(orbit_id %in% input$orbits_checkbox)
+      l <- unlist(strsplit(input$list_orbits, ","))
+      ul <- l[!(l %in% input$orbits_checkbox)] 
+      rv$draw_orbits_overlapping_unselected <- rv$s2orbits %>% dplyr::filter(orbit_id %in% ul)
+      leafletProxy("view_map_extent") %>% 
+        addPolylines(
+          data = rv$draw_orbits_overlapping_selected,
+          group = "S2 orbits",
+          layerId = ~orbit_id,
+          label = ~orbit_id,
+          stroke = TRUE,
+          color = "red"
+        )
+      if (length(ul) > 0L) {
+        leafletProxy("view_map_extent") %>% 
+          addPolylines(
+            data = rv$draw_orbits_overlapping_unselected,
+            group = "S2 orbits",
+            layerId = ~orbit_id,
+            label = ~orbit_id,
+            stroke = TRUE,
+            color = "grey"
+          )
+      }
+    } else {
+      l <- unlist(strsplit(input$list_orbits, ","))
+      ul <- l[!(l %in% input$orbits_checkbox)] 
+      rv$draw_orbits_overlapping_unselected <- rv$s2orbits %>% dplyr::filter(orbit_id %in% ul)
+      if (length(l) > 1L) {
+        leafletProxy("view_map_extent") %>%
+          addPolylines(
+            data = rv$draw_orbits_overlapping_unselected,
+            group = "S2 orbits",
+            layerId = ~orbit_id,
+            label = ~orbit_id,
+            stroke = TRUE,
+            color = "grey"
+          )
+      }
+    }
+  })
+  
   #- Update tile colours when single tiles are [de]activated -#
   observeEvent(input$tiles_checkbox, ignoreNULL = FALSE, {
     if (!is.null(input$tiles_checkbox)) {
@@ -391,13 +450,11 @@ mod_temporal_map_server <- function(input, output, session, rv){
         i18n$t("restrict the processing to the specified tiles and <a href="),
         i18n$t("'https://sentinel.esa.int/web/sentinel/missions/sentinel-2/satellite-description/orbit'"),
         i18n$t("target='_blank'>orbits</a>."),
-        i18n$t("The list of tiles which can be selected is dynamically updated"),
+        i18n$t("The list of tiles and orbits which can be selected are dynamically updated"),
         i18n$t("basing on the selected extent"),
-        i18n$t("(only tiles overlapping the extent are shown),"),
-        i18n$t("as well as the colour of tiles shown in the map is dynamically set"),
-        i18n$t("(selected tiles are shown in red, unselected ones in grey)."),
-        i18n$t("The list of orbits is static, and orbits are not shown"),
-        i18n$t("on the map.")
+        i18n$t("(only tiles and orbits overlapping the extent are shown),"),
+        i18n$t("as well as the colour of tiles and orbits shown in the map is dynamically set"),
+        i18n$t("(selected tiles and orbits are shown in red, unselected ones in grey).")
       )),
       easyClose = TRUE,
       footer = NULL

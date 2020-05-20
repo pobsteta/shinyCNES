@@ -94,9 +94,17 @@ mod_spectral_indice_server <- function(input, output, session, rv){
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
   
+  # for save parameters
+  observe({
+    rv$index_source <- input$index_source
+    rv$index_datatype <- input$index_datatype
+    rv$verified_indices <- input$verified_indices
+    rv$check_indices <- input$check_indices
+    rv$list_indices <- input$list_indices
+  })
+  
   # Reactive variable: TRUE if indices are required, FALSE if not
   indices_req <- reactive({
-    # "indices" %in% input$steps_reqout &
     !is.null(input$list_indices)
   })
 

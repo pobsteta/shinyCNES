@@ -30,16 +30,18 @@ import_param_list <- function(session, rv) {
       updateRadioButtons(session, "pepscollection", selected = rv$pepscollection)
     }
     # platform and level ####
-    if (rv$theiacollection == "landsat") {
-      updateRadioButtons(session, "theiaplatformlandsat", selected = rv$theiaplatformlandsat)
-    } else if (rv$theiacollection == "spotworldheritage") {
-      updateRadioButtons(session, "theiaplatformspotworldheritage", selected = rv$theiaplatformspotworldheritage)
-    } else if (rv$theiacollection == "sentinel2") {
-      updateRadioButtons(session, "theiaplatformsentinel", selected = rv$theiaplatformsentinel)
-      # level
-      updateRadioButtons(session, "theiaplatformsentinellevel", selected = rv$theiaplatformsentinellevel)
-    } else if (rv$theiacollection == "venus") {
-      updateRadioButtons(session, "theiaplatformvenus", selected = rv$theiaplatformvenus)
+    if (!is.na(rv$theiacollection)) {
+      if (rv$theiacollection == "landsat") {
+        updateRadioButtons(session, "theiaplatformlandsat", selected = rv$theiaplatformlandsat)
+      } else if (rv$theiacollection == "spotworldheritage") {
+        updateRadioButtons(session, "theiaplatformspotworldheritage", selected = rv$theiaplatformspotworldheritage)
+      } else if (rv$theiacollection == "sentinel2") {
+        updateRadioButtons(session, "theiaplatformsentinel", selected = rv$theiaplatformsentinel)
+        # level
+        updateRadioButtons(session, "theiaplatformsentinellevel", selected = rv$theiaplatformsentinellevel)
+      } else if (rv$theiacollection == "venus") {
+        updateRadioButtons(session, "theiaplatformvenus", selected = rv$theiaplatformvenus)
+      }
     }
     # product ####
     # saving options ####
@@ -74,12 +76,16 @@ import_param_list <- function(session, rv) {
     # product ####
     setProgress(0.4)
     
+    # indices spectral ####
+    if (all(is.na(nn(rv$list_indices)))) {rv$list_indices <- character(0)}
+    # indices_rv$checked <- rv$list_indices
+    updateCheckboxGroupInput(session, "list_indices", selected = rv$list_indices)
+    
     # update extent (at the end, not to interfer with other events
     # (the delay is required to update the map after the map is charged)
     # shinyjs::delay(5E3, {
       update_extent(extent_source = "imported", rv = rv, custom_source = rv$extent, session = session)
       updatePickerInput(session, "tiles_checkbox", selected = if(length(nn(rv$s2tiles_selected))>0) {rv$s2tiles_selected} else {NA})
-      # rv$update_tiles_on_map <- sample(1E6, 1) # update the [un]selected tiles on the map
     # })
     updatePickerInput(session, "orbits_checkbox", selected = if(length(nn(rv$s2orbits_selected))>0) {rv$s2orbits_selected} else {NA})
 
@@ -300,7 +306,7 @@ create_return_list <- function(rv) {
   rl$parallel <- as.logical(rv$parallel)
   rl$n_cores <- rv$n_cores
   # temporal parameters ####
-  rl$query_time <- rv$query_time
+  rl$query_time <- as.logical(rv$query_time)
   # spatio-temporal selection ####
   rl$timewindow <- if (rv$query_time == TRUE) { # range of dates
     rv$timewindow
@@ -313,29 +319,30 @@ create_return_list <- function(rv) {
     "full"
   }
 
+  # selected tile IDs
+  rl$s2tiles_selected <- if (rv$query_space == TRUE & length(nn(rv$tiles_checkbox)>0)) {
+    rv$tiles_checkbox
+  } else {
+    NA
+  }
+  # selected orbit IDs
+  rl$s2orbits_selected <- if (rv$query_space == TRUE & length(nn(rv$orbits_checkbox)>0)) {
+    rv$orbits_checkbox
+  } else {
+    NA
+  }
+  
+  # spectral indices and RGB images
+  rl$list_indices <- rv$list_indices
+  
   # polygon extent
-  rl$extent <- if (!is.null(rv$extent) & !is.na(rv$extent)) {
+  rl$extent <- if (!is.null(rv$extent)) {
     rv$extent %>%
       st_transform(4326) %>%
       geojson_json(pretty = TRUE)
   } else {
     NA
   }
-  # # selected tile IDs
-  # rl$s2tiles_selected <- if (rv$query_space == TRUE & length(nn(rv$tiles_checkbox)>0)) {
-  #   rv$tiles_checkbox
-  # } else {
-  #   NA
-  # }
-  # # selected orbit IDs
-  # rl$s2orbits_selected <- if (rv$query_space == TRUE & length(nn(rv$orbits_checkbox)>0)) {
-  #   rv$orbits_checkbox
-  # } else {
-  #   NA
-  # }
-  
-  # spectral indices and RGB images
-  # rl$list_indices <- rv$list_indices
 
   return(rl)
 }

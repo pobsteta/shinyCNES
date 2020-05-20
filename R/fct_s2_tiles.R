@@ -8,7 +8,6 @@
 #' @export
 #' 
 s2_tiles <- function() {
-  
   # extract and import tiles kml
   s2tiles_kmz <- system.file("data-raw/vector/s2_tiles.kmz", package = "shinyCNES")
   s2tiles_kml <- gsub("\\.kmz$", ".kml", s2tiles_kmz)

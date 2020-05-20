@@ -12,13 +12,14 @@ app_server <- function( input, output, session ) {
     project_name = NULL,
     path_project = NULL,
     # extract and import tiles kml
-    s2tiles = s2_tiles()
+    s2tiles = s2_tiles(),
+    s2orbits = s2_orbits()
   )
   
   # tab1
   param <- callModule(mod_param_server, "product", rv = r)
-  callModule(mod_temporal_map_server, "product", rv = param)
-  callModule(mod_project_server, "product", rv = param)
+  callModule(mod_temporal_map_server, "product", rv = r)
+  callModule(mod_project_server, "product", rv = r)
   # tab 2
   callModule(mod_product_type_server, "product", rv = r)
   callModule(mod_collection_type_server, "product", rv = r)

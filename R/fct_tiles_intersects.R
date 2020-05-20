@@ -22,7 +22,6 @@
 #' @note License: GPL 3.0
 #' 
 tiles_intersects <- function(extent, all = FALSE, out_format = "id", .s2tiles=NULL) {
-  
   # Load S2 tiles
   s2tiles <- if (is.null(.s2tiles)) {
     s2_tiles()
@@ -31,7 +30,7 @@ tiles_intersects <- function(extent, all = FALSE, out_format = "id", .s2tiles=NU
   } else {
     st_transform(.s2tiles, 4326)
   }
-  
+
   # Extent to longlat
   extent <- st_transform(extent, 4326)
   if (is(extent,"sf")) {

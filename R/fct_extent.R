@@ -11,7 +11,8 @@
 #' @return Update the map
 #' @export
 #'
-#' @importFrom leaflet leafletProxy clearShapes addPolygons showGroup fitBounds pathOptions labelOptions
+#' @importFrom leaflet leafletProxy clearShapes addPolygons showGroup fitBounds 
+#' pathOptions labelOptions addPolylines
 #' @importFrom sf st_polygon st_read st_coordinates st_zm st_geometry st_transform
 #' @importFrom dplyr filter
 #'
@@ -65,13 +66,11 @@ update_extent <- function(rv, extent_source, custom_source = NA, map = "view_map
       attr(x, "new") <- TRUE
       x
     }
-
     rv$extent <- sel_imported_extent
     if (!attr(sel_imported_extent, "valid")) {
       rv$out <- FALSE
       return(rv)
     }
-    rv$extent <- sel_imported_extent
   } else {
     # for any other value of extent_source, use the existing rv$extent
     if (is.null(rv$extent)) {
@@ -85,9 +84,10 @@ update_extent <- function(rv, extent_source, custom_source = NA, map = "view_map
     }
   }
 
-  # 2. Update the list of overlapping tiles and the tiles on the map
+  # 2. Update the list of overlapping tiles and orbits and the tiles on the map
   if (length(rv$extent) > 0) {
-    rv$draw_tiles_overlapping <- tiles_intersects(rv$extent, all = TRUE, out_format = "sf", .s2tiles = rv$s2tiles)
+    # tiles
+    rv$draw_tiles_overlapping <- tiles_intersects(extent = rv$extent, all = TRUE, out_format = "sf")
     names(sf::st_geometry(rv$draw_tiles_overlapping)) <- NULL
 
     if (attr(rv$extent, "new")) {
@@ -99,9 +99,24 @@ update_extent <- function(rv, extent_source, custom_source = NA, map = "view_map
       )
       updateTextInput(session, "list_tiles", value = rv$draw_tiles_overlapping$tile_id)
     }
+    
+    # orbits
+    rv$draw_orbits_overlapping <- orbits_intersects(tiles = rv$draw_tiles_overlapping, all = TRUE, out_format = "sf")
+    names(sf::st_geometry(rv$draw_orbits_overlapping)) <- NULL
+    
+    if (attr(rv$extent, "new")) {
+      updatePickerInput(
+        session, 
+        "orbits_checkbox",
+        choices = rv$draw_orbits_overlapping$orbit_id,
+        selected = ""
+      )
+      updateTextInput(session, "list_orbits", value = rv$draw_orbits_overlapping$orbit_id)
+    }
 
     # reset and update the map
     rv$draw_tiles_overlapping_ll <- st_transform(rv$draw_tiles_overlapping, 4326)
+    rv$draw_orbits_overlapping_ll <- st_transform(rv$draw_orbits_overlapping, 4326)
     rv$extent_ll <- st_transform(rv$extent, 4326)
     leafletProxy(mapId = ns(map), session = session) %>%
       clearShapes() %>%
@@ -111,6 +126,16 @@ update_extent <- function(rv, extent_source, custom_source = NA, map = "view_map
         lng2 = max(st_coordinates(rv$draw_tiles_overlapping_ll)[, "X"]),
         lat2 = max(st_coordinates(rv$draw_tiles_overlapping_ll)[, "Y"])
       ) %>%
+      # add tiles
+      addPolylines(
+        data = rv$draw_orbits_overlapping_ll,
+        group = "S2 orbits",
+        layerId = ~orbit_id,
+        label = ~orbit_id,
+        stroke = TRUE,
+        color = "grey"
+      ) %>%
+      # add orbits
       addPolygons(
         data = rv$draw_tiles_overlapping_ll,
         group = "S2 tiles",

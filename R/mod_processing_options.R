@@ -26,7 +26,7 @@ mod_processing_options_ui <- function(id){
           selectInput(
             ns("processing_order"),
             span(
-              "Processing order\u2000",
+              i18n$t("Processing order\u2000"),
               actionLink(ns("help_processing_order"), icon("question-circle"))
             ),
             choices = list(
@@ -43,7 +43,7 @@ mod_processing_options_ui <- function(id){
           width = 4,
           radioButtons(
             ns("parallel"),
-            label = span("Parallel computation?"),
+            label = span(i18n$t("Parallel computation?")),
             choiceNames = list("Yes", "No"),
             choiceValues = list(TRUE, FALSE),
             selected = TRUE,
@@ -57,7 +57,7 @@ mod_processing_options_ui <- function(id){
             div(
               sliderInput(
                 ns("n_cores"), 
-                label = "Number of CPU cores",
+                label = i18n$t("Number of CPU cores"),
                 min = 1, 
                 max = parallel::detectCores(),
                 value = parallel::detectCores()-1,
@@ -80,6 +80,13 @@ mod_processing_options_server <- function(input, output, session, rv){
   
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
+  
+  # for save parameters
+  observe({
+    rv$processing_order <- input$processing_order
+    rv$parallel <- input$parallel
+    rv$n_cores <- input$n_cores
+  })
   
   observeEvent(input$help_processing_order, {
     showModal(modalDialog(
