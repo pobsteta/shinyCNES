@@ -24,6 +24,7 @@ mod_rgb_image_ui <- function(id){
         collapsible = TRUE,
         width = 12,
         uiOutput(ns("checkbox_list_rgb")),
+        textInput(ns("list_check_list_rgb"), label = ""),
         div(
           style = "display:inline-block;padding-top:10px;padding-right:10px;",
           actionButton(
@@ -56,8 +57,16 @@ mod_rgb_image_server <- function(input, output, session, rv){
   
   # for save parameters
   observe({
-    rv$list_rgb <- input$list_rgb
+    rv$list_rgbimages <- input$list_rgbimages
   })
+  
+  rgb_req <- reactive({
+    !is.null(rv$list_rgb_ranges)
+  })
+  # convert in output value to be used in conditionalPanel
+  output$rgb_req <- renderText(rgb_req())
+  # options to update these values also if not visible
+  outputOptions(output, "rgb_req", suspendWhenHidden = FALSE)
   
   # list with the names of Sentinel-2 bands
   s2_bands <- list("TOA" = list(
@@ -125,7 +134,6 @@ mod_rgb_image_server <- function(input, output, session, rv){
         i18n$t("RGB images:\u2000"),
         actionLink(ns("help_rgb"), icon("question-circle"))
       ),
-      # choiceNames = lapply(names(rv$list_rgb_ranges), HTML),
       choiceNames = lapply(names(rv$list_rgb_ranges), function(x) {
         ranges <- if (length(rv$list_rgb_ranges[[x]]) == 6) {
           c("min_r"=1, "min_g"=2, "min_b"=3, "max_r"=4, "max_g"=5, "max_b"=6)
@@ -153,9 +161,12 @@ mod_rgb_image_server <- function(input, output, session, rv){
         ))
       }),
       choiceValues = as.list(names(rv$list_rgb_ranges)),
-      selected = input$list_rgbimages
+      # selected = input$list_rgbimages
+      selected = sprintf("input['%s']", ns("list_rgbimages"))
+      # selected = c("RGB432B","RGB843B")
     )
   })
+  
   outputOptions(output, "checkbox_list_rgb", suspendWhenHidden = FALSE)
   # this to avoid errors in case a json were imported before activating checkbox_list_rgb
   # TODO: with this trick, also indices_rv could be avoid and simplified

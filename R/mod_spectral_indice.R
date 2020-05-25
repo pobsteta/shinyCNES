@@ -75,7 +75,8 @@ mod_spectral_indice_ui <- function(id){
               )
             ) # end column
           ), # end fluidrow
-          uiOutput(ns("check_indices"))
+          uiOutput(ns("check_indices")),
+          textInput(ns("list_check_indices"), label = "")
         ), # end box
         uiOutput(ns("show_formula"))
       ) # end fluidrow
@@ -149,10 +150,6 @@ mod_spectral_indice_server <- function(input, output, session, rv){
                                       list(name,extendedname)]
   })
   
-  observe({
-    indices_rv$checked <- sort(nn(input$list_indices))
-  })
-  
   output$check_indices <- renderUI({
     checkboxGroupInput(
       ns("list_indices"),
@@ -161,6 +158,11 @@ mod_spectral_indice_server <- function(input, output, session, rv){
       choiceValues = as.list(indices_rv$filtered$name),
       selected = indices_rv$checked
     )
+  })
+  
+  observe({
+    updateTextInput(session, "list_check_indices", value = sort(nn(input$list_indices)))
+    indices_rv$checked <- sort(nn(input$list_indices))
   })
   
   index_details <- function(index) {

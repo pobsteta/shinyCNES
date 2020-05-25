@@ -33,6 +33,7 @@ mod_param_ui <- function(id) {
           i18n$t("Save parameters as"),
           i18n$t("Save parameters of the project as"),
           icon = icon("upload"),
+          style = "width:196px",
           filetype = list(json = "json"),
           class = "darkbutton"
         )
@@ -44,6 +45,7 @@ mod_param_ui <- function(id) {
           i18n$t("Load parameters"),
           i18n$t("Import a JSON file with parameters of the project"),
           icon = icon("download"),
+          style = "width:196px",
           multiple = FALSE,
           class = "darkbutton"
         )
@@ -54,6 +56,7 @@ mod_param_ui <- function(id) {
           ns("exit_gui"),
           label = i18n$t("\u2000Close application"),
           icon = icon("close"),
+          width = 196,
           class = "darkbutton"
         )
       )
@@ -68,7 +71,7 @@ mod_param_ui <- function(id) {
 #' @keywords internal
 #' @import shinyFiles
 #' @importFrom jsonlite toJSON
-#' @importFrom shiny updateTextInput withProgress NS
+#' @importFrom shiny updateTextInput withProgress NS stopApp
 #' @importFrom shinyFiles parseFilePaths shinyFileSave parseSavePath getVolumes
 #'
 mod_param_server <- function(input, output, session, rv) {

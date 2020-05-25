@@ -131,7 +131,7 @@ mod_temporal_map_ui <- function(id){
 #' 
 #' @importFrom sf st_geometry_type st_as_sf
 #' @importFrom shinyjs enable disable
-#' @importFrom leaflet removeShape leafletProxy removeLayersControl
+#' @importFrom leaflet removeShape leafletProxy removeLayersControl getMapData
 #' 
 mod_temporal_map_server <- function(input, output, session, rv){
   ns <- session$ns
@@ -428,8 +428,11 @@ mod_temporal_map_server <- function(input, output, session, rv){
   #- Refresh the extent map if required -#
   observeEvent(input$button_refresh_map, {
     withProgress(message = i18n$t("\u2000Reload map extent"), value = 0, {
-      refresh <- update_extent(extent_source = "fake", map = "view_map_extent", rv = rv, session = session)
-      rv <- refresh
+      m <- leaflet::getMapData(map = leafletProxy("view_map_extent"))
+      print(m)
+      print(rv$extent)
+      # refresh <- update_extent(extent_source = "fake", map = "view_map_extent", rv = rv, session = session)
+      # rv <- refresh
       updatePickerInput(
         session, 
         "tiles_checkbox",
