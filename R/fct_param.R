@@ -10,6 +10,7 @@
 #' @export
 #'
 import_param_list <- function(session, rv) {
+  ns <- session$ns
   i18n <- Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
   # Add a progress bar while importing
@@ -78,15 +79,15 @@ import_param_list <- function(session, rv) {
     
     # indices spectral ####
     if (all(is.na(nn(rv$list_indices)))) {rv$list_indices <- character(0)}
-    # indices_rv$checked <- rv$list_indices
     updateCheckboxGroupInput(session, "list_indices", selected = rv$list_indices)
+    updateTextInput(session, "list_check_indices", value = sort(nn(rv$list_indices)))
+    # rgb images ####
+    if (all(is.na(nn(rv$list_rgbimages)))) {rv$list_rgbimages <- character(0)}
+    rv$list_rgb_ranges <- setNames(rv$rgb_ranges, rv$list_rgbimages)
+    updateCheckboxGroupInput(session, "list_rgbimages", selected = rv$list_rgbimages)
     
-    # update extent (at the end, not to interfer with other events
-    # (the delay is required to update the map after the map is charged)
-    # shinyjs::delay(5E3, {
-      update_extent(extent_source = "imported", rv = rv, custom_source = rv$extent, session = session)
-      updatePickerInput(session, "tiles_checkbox", selected = if(length(nn(rv$s2tiles_selected))>0) {rv$s2tiles_selected} else {NA})
-    # })
+    update_extent(extent_source = "imported", rv = rv, custom_source = rv$extent, session = session)
+    updatePickerInput(session, "tiles_checkbox", selected = if(length(nn(rv$s2tiles_selected))>0) {rv$s2tiles_selected} else {NA})
     updatePickerInput(session, "orbits_checkbox", selected = if(length(nn(rv$s2orbits_selected))>0) {rv$s2orbits_selected} else {NA})
 
     setProgress(1)
@@ -334,6 +335,8 @@ create_return_list <- function(rv) {
   
   # spectral indices and RGB images
   rl$list_indices <- rv$list_indices
+  rl$list_rgbimages <- rv$list_rgbimages
+  rl$rgb_ranges <- setNames(rv$list_rgb_ranges[rv$list_rgbimages], NULL)
   
   # polygon extent
   rl$extent <- if (!is.null(rv$extent)) {

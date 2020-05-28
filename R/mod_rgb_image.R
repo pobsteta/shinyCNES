@@ -161,9 +161,7 @@ mod_rgb_image_server <- function(input, output, session, rv){
         ))
       }),
       choiceValues = as.list(names(rv$list_rgb_ranges)),
-      # selected = input$list_rgbimages
-      selected = sprintf("input['%s']", ns("list_rgbimages"))
-      # selected = c("RGB432B","RGB843B")
+      selected = input$list_rgbimages
     )
   })
   
