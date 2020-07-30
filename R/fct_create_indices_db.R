@@ -514,7 +514,7 @@ create_indices_db <- function(xslt_path = NA,
   
   json_table <- list(
     "indices" = s2_table,
-    "pkg_version" = as.character(packageVersion("sen2r")),
+    "pkg_version" = as.character(packageVersion("shinyCNES")),
     "creation_date" = as.character(Sys.time())
   )
   writeLines(jsonlite::toJSON(json_table, digits=NA, pretty=TRUE), json_path)
