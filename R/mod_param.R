@@ -24,7 +24,7 @@ mod_param_ui <- function(id) {
   tagList(
     ### button
     div(
-      style = "position:absolute;top:100px;",
+      style = "top:100px;",
       # server-side buttons
       p(
         style = "margin-top:15pt;",
@@ -76,7 +76,7 @@ mod_param_ui <- function(id) {
 #'
 mod_param_server <- function(input, output, session, rv) {
   ns <- session$ns
-  
+
   rv$out <- FALSE
 
   volumes <- c("Home" = path.expand("~"), shinyFiles::getVolumes()())
@@ -127,7 +127,6 @@ mod_param_server <- function(input, output, session, rv) {
     }
     if (!is.null(rv$imported_param)) {
       out <- import_param_list(session = session, rv = rv$imported_param)
-      # rv$extent <- rv$imported_param$extent
     }
     rv$imported_param <- NULL
   })
@@ -141,7 +140,7 @@ mod_param_server <- function(input, output, session, rv) {
   session$onSessionEnded(function() {
     stopApp()
   })
-  return (rv)
+  return(rv)
 }
 
 ## To be copied in the UI

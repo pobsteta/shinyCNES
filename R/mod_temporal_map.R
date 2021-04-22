@@ -187,7 +187,7 @@ mod_temporal_map_server <- function(input, output, session, rv){
         session,
         title = i18n$t("Invalid polygon"),
         text = paste(
-          i18n$t("Please select a gpkg polygon.")
+          i18n$t("Please select a gpkg polygon!")
         ),
         type = "error",
         btn_labels = "Ok"
@@ -429,13 +429,9 @@ mod_temporal_map_server <- function(input, output, session, rv){
   observeEvent(input$button_refresh_map, {
     withProgress(message = i18n$t("\u2000Reload map extent"), value = 0, {
       m <- leaflet::getMapData(map = leafletProxy("view_map_extent"))
-      print(m)
-      print(rv$extent)
-      # refresh <- update_extent(extent_source = "fake", map = "view_map_extent", rv = rv, session = session)
-      # rv <- refresh
       updatePickerInput(
         session, 
-        "tiles_checkbox",
+        ns("tiles_checkbox"),
         selected = ""
       )
       for (i in 1:10) {
