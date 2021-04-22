@@ -151,6 +151,41 @@ mod_save_options_server <- function(input, output, session, rv){
       footer = NULL
     ))
   })
+  
+  # Edit theia credentials login
+  observeEvent(input$theia, {
+    # open the modalDialog
+    showModal(theia_modal(
+      username = if (!is.null(input$theia_username)) {
+        input$theia_username
+      } else {
+        NA
+      },
+      password = if (!is.null(input$theia_password)) {
+        input$theia_password
+      } else {
+        NA
+      }, 
+      session = session
+    ))
+    # initialise the shinyFiles Save as button
+    observe({
+      apitheia_path_prev <- rv$apitheia_path
+      shinyFileSave(input, "apitheia_path_sel", roots = rv$volumes, session = session)
+    })
+  })
+  # save user/password
+  observeEvent(input$save_apitheia, {
+    write_theia_login(
+      input$theia_username, input$theia_password,
+      apitheia_path = if (!is.na(rv$apitheia_path)) {
+        as.character(rv$apitheia_path)
+      } else {
+        NA
+      }
+    )
+    removeModal()
+  })
  
 }
     

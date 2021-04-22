@@ -60,7 +60,7 @@ mod_processing_options_ui <- function(id){
                 label = i18n$t("Number of CPU cores"),
                 min = 1, 
                 max = parallel::detectCores(),
-                value = parallel::detectCores()-1,
+                value = parallel::detectCores() - 1,
                 step = 1,
                 ticks = FALSE
               ) # end slider

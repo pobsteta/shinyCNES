@@ -4,15 +4,15 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
-mod_rgb_image_ui <- function(id){
+#' @importFrom shiny NS tagList
+mod_rgb_image_ui <- function(id) {
   ns <- NS(id)
-  
+
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
-  
+
   tagList(
     tabName = "rgb",
     h3(i18n$t("RGB images selection")),
@@ -24,7 +24,7 @@ mod_rgb_image_ui <- function(id){
         collapsible = TRUE,
         width = 12,
         uiOutput(ns("checkbox_list_rgb")),
-        textInput(ns("list_check_list_rgb"), label = ""),
+        textInput(ns("list_checkbox_rgb"), label = ""),
         div(
           style = "display:inline-block;padding-top:10px;padding-right:10px;",
           actionButton(
@@ -45,21 +45,23 @@ mod_rgb_image_ui <- function(id){
     ) # end fluidrow
   ) # end taglist
 }
-    
+
 #' rgb_image Server Function
 #'
-#' @noRd 
-mod_rgb_image_server <- function(input, output, session, rv){
+#' @noRd
+mod_rgb_image_server <- function(input, output, session, rv) {
   ns <- session$ns
-  
+
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
-  
+
   # for save parameters
   observe({
-    rv$list_rgbimages <- input$list_rgbimages
+    rv$list_rgb <- input$list_rgb
+    updateTextInput(session, "list_checkbox_rgb", 
+                    value = sort(nn(input$list_rgb)))
   })
-  
+
   rgb_req <- reactive({
     !is.null(rv$list_rgb_ranges)
   })
@@ -67,7 +69,7 @@ mod_rgb_image_server <- function(input, output, session, rv){
   output$rgb_req <- renderText(rgb_req())
   # options to update these values also if not visible
   outputOptions(output, "rgb_req", suspendWhenHidden = FALSE)
-  
+
   # list with the names of Sentinel-2 bands
   s2_bands <- list("TOA" = list(
     "Band 1 (443 nm)" = "band1",
@@ -83,15 +85,15 @@ mod_rgb_image_server <- function(input, output, session, rv){
     "Band 11 (1610 nm)" = "band11",
     "Band 12 (2190 nm)" = "band12"
   ))
-  s2_bands[["BOA"]] <- s2_bands[["TOA"]][c(1:9,11:12)]
-  
+  s2_bands[["BOA"]] <- s2_bands[["TOA"]][c(1:9, 11:12)]
+
   # Define default RGB images
   rv$list_rgb_ranges <- list(
     "RGB432B" = c(0, 2500),
     "RGB843B" = matrix(c(0, 0, 0, 7500, 2500, 2500), ncol = 2),
     "RGBb84B" = matrix(c(0, 0, 0, 7500, 7500, 2500), ncol = 2)
   )
-  
+
   # Open modalDialog to add a new RGB
   observeEvent(input$new_rgb, {
     showModal(add_rgb_image(s2_bands = s2_bands, session = session))
@@ -99,24 +101,24 @@ mod_rgb_image_server <- function(input, output, session, rv){
   # Add the new defined RGB
   observeEvent(input$add_new_rgb, {
     newrgb_ranges <- if (all(c(
-      input$band_r_range==input$band_g_range,
-      input$band_g_range==input$band_b_range
+      input$band_r_range == input$band_g_range,
+      input$band_g_range == input$band_b_range
     ))) {
-      list(input$band_r_range*1E4)
+      list(input$band_r_range * 1E4)
     } else {
       list(t(matrix(
-        c(input$band_r_range, input$band_g_range, input$band_b_range)*1E4,
+        c(input$band_r_range, input$band_g_range, input$band_b_range) * 1E4,
         nrow = 2
       )))
     }
     names(newrgb_ranges) <- paste0(
       "RGB",
       paste(as.hexmode(c(
-        as.integer(gsub("^band","",input$band_r)),
-        as.integer(gsub("^band","",input$band_g)),
-        as.integer(gsub("^band","",input$band_b))
-      )), collapse=""),
-      substr(input$newrgb_source,1,1)
+        as.integer(gsub("^band", "", input$band_r)),
+        as.integer(gsub("^band", "", input$band_g)),
+        as.integer(gsub("^band", "", input$band_b))
+      )), collapse = ""),
+      substr(input$newrgb_source, 1, 1)
     )
     rv$list_rgb_ranges <- append(newrgb_ranges, rv$list_rgb_ranges)
     # new added RGB replaces existing one, if it is was already present
@@ -125,71 +127,71 @@ mod_rgb_image_server <- function(input, output, session, rv){
     rv$list_rgb_ranges <- rv$list_rgb_ranges[order(names(rv$list_rgb_ranges))]
     removeModal()
   })
-  
+
   # List of defined RGB images
   output$checkbox_list_rgb <- renderUI({
     checkboxGroupInput(
-      ns("list_rgbimages"),
+      ns("list_rgb"),
       label = span(
         i18n$t("RGB images:\u2000"),
         actionLink(ns("help_rgb"), icon("question-circle"))
       ),
       choiceNames = lapply(names(rv$list_rgb_ranges), function(x) {
         ranges <- if (length(rv$list_rgb_ranges[[x]]) == 6) {
-          c("min_r"=1, "min_g"=2, "min_b"=3, "max_r"=4, "max_g"=5, "max_b"=6)
+          c("min_r" = 1, "min_g" = 2, "min_b" = 3, "max_r" = 4, "max_g" = 5, "max_b" = 6)
         } else if (length(rv$list_rgb_ranges[[x]]) == 2) {
-          c("min_r"=1, "min_g"=1, "min_b"=1, "max_r"=2, "max_g"=2, "max_b"=2)
+          c("min_r" = 1, "min_g" = 1, "min_b" = 1, "max_r" = 2, "max_g" = 2, "max_b" = 2)
         }
         HTML(paste0(
-          "<strong>",x,":</strong> ",
-          "<ul><li><i>source:</i> ",substr(x,7,7),"OA</li>",
+          "<strong>", x, ":</strong> ",
+          "<ul><li><i>source:</i> ", substr(x, 7, 7), "OA</li>",
           "<li><span style='color:red;'><i>red: </i>",
-          "band ",strtoi(paste0("0x", substr(x,4,4))),
+          "band ", strtoi(paste0("0x", substr(x, 4, 4))),
           " (reflectance range ",
-          rv$list_rgb_ranges[[x]][ranges["min_r"]]/1E4," \u2013 ",
-          rv$list_rgb_ranges[[x]][ranges["max_r"]]/1E4,")</span></li>",
+          rv$list_rgb_ranges[[x]][ranges["min_r"]] / 1E4, " \u2013 ",
+          rv$list_rgb_ranges[[x]][ranges["max_r"]] / 1E4, ")</span></li>",
           "<li><span style='color:darkgreen;'><i>green: </i>",
-          "band ",strtoi(paste0("0x", substr(x,5,5))),
+          "band ", strtoi(paste0("0x", substr(x, 5, 5))),
           " (reflectance range ",
-          rv$list_rgb_ranges[[x]][ranges["min_g"]]/1E4," \u2013 ",
-          rv$list_rgb_ranges[[x]][ranges["max_g"]]/1E4,")</span></li>",
+          rv$list_rgb_ranges[[x]][ranges["min_g"]] / 1E4, " \u2013 ",
+          rv$list_rgb_ranges[[x]][ranges["max_g"]] / 1E4, ")</span></li>",
           "<li><span style='color:blue;'><i>blue: </i>",
-          "band ",strtoi(paste0("0x", substr(x,6,6))),
+          "band ", strtoi(paste0("0x", substr(x, 6, 6))),
           " (reflectance range ",
-          rv$list_rgb_ranges[[x]][ranges["min_b"]]/1E4," \u2013 ",
-          rv$list_rgb_ranges[[x]][ranges["max_b"]]/1E4,")</span></li></ul>"
+          rv$list_rgb_ranges[[x]][ranges["min_b"]] / 1E4, " \u2013 ",
+          rv$list_rgb_ranges[[x]][ranges["max_b"]] / 1E4, ")</span></li></ul>"
         ))
       }),
       choiceValues = as.list(names(rv$list_rgb_ranges)),
-      selected = input$list_rgbimages
+      selected = rv$list_rgb
     )
   })
-  
+
   outputOptions(output, "checkbox_list_rgb", suspendWhenHidden = FALSE)
   # this to avoid errors in case a json were imported before activating checkbox_list_rgb
   # TODO: with this trick, also indices_rv could be avoid and simplified
-  
+
   # Remove selected RGB images
   observeEvent(input$rm_rgb, {
-    rv$list_rgb_ranges <- rv$list_rgb_ranges[names(rv$list_rgb_ranges) %in% input$list_rgbimages]
+    rv$list_rgb_ranges <- rv$list_rgb_ranges[names(rv$list_rgb_ranges) %in% input$list_rgb]
   })
-  
+
   # Update RGB bands and ranges when changing RGB source
   observeEvent(input$newrgb_source, {
     updatePickerInput(
-      session, 
+      session,
       "band_r",
       choices = s2_bands[[input$newrgb_source]],
       selected = input$band_r
     )
     updatePickerInput(
-      session, 
+      session,
       "band_g",
       choices = s2_bands[[input$newrgb_source]],
       selected = input$band_g
     )
     updatePickerInput(
-      session, 
+      session,
       "band_b",
       choices = s2_bands[[input$newrgb_source]],
       selected = input$band_b
@@ -197,51 +199,51 @@ mod_rgb_image_server <- function(input, output, session, rv){
   })
   observeEvent(input$band_r, {
     updateSliderInput(
-      session, 
+      session,
       "band_r_range",
-      value = if (input$band_r %in% paste0("band",1:5)) {
+      value = if (input$band_r %in% paste0("band", 1:5)) {
         c(0, 0.25)
-      } else if (input$band_r %in% paste0("band",6:12)) {
+      } else if (input$band_r %in% paste0("band", 6:12)) {
         c(0, 0.75)
       }
     )
   })
   observeEvent(input$band_g, {
     updateSliderInput(
-      session, 
+      session,
       "band_g_range",
-      value = if (input$band_g %in% paste0("band",1:5)) {
+      value = if (input$band_g %in% paste0("band", 1:5)) {
         c(0, 0.25)
-      } else if (input$band_g %in% paste0("band",6:12)) {
+      } else if (input$band_g %in% paste0("band", 6:12)) {
         c(0, 0.75)
       }
     )
   })
   observeEvent(input$band_b, {
     updateSliderInput(
-      session, 
+      session,
       "band_b_range",
-      value = if (input$band_b %in% paste0("band",1:5)) {
+      value = if (input$band_b %in% paste0("band", 1:5)) {
         c(0, 0.25)
-      } else if (input$band_b %in% paste0("band",6:12)) {
+      } else if (input$band_b %in% paste0("band", 6:12)) {
         c(0, 0.75)
       }
     )
   })
-  
+
   observeEvent(input$help_rgb, {
     showModal(modalDialog(
       title = i18n$t("RGB images:"),
       p(HTML(
         i18n$t("RGB images can be built using different spectral bands."),
         i18n$t("To distinguish each other, the naming convention"),
-        i18n$t("'<strong>x</strong>RGB<strong>rgb</strong>', where:"),
-        i18n$t("<ul><li><strong>x</strong> is B (if source is BOA)"),
-        i18n$t("or T (is source is TOA);</li>"),
-        i18n$t("<li><strong>r</strong>, <strong>g</strong> and <strong>b</strong>"),
+        i18n$t("'RGB<strong>rgb</strong><strong>X</strong>', where:"),
+        i18n$t("<ul><li><strong>r</strong>, <strong>g</strong> and <strong>b</strong>"),
         i18n$t("are the the number of the bands to be used respectively for red,"),
         i18n$t("green and blue, in hexadecimal format"),
-        i18n$t("(so i.e. band 8 is 8, band 11 is b).</li></ul>")
+        i18n$t("(so i.e. band 8 is 8, band 11 is b).</li></ul>"),
+        i18n$t("<ul><li><strong>X</strong> is B (if source is BOA)"),
+        i18n$t("or T (is source is TOA);</li></ul>")
       )),
       p(HTML(
         i18n$t("By default, three RGB images are defined:"),
@@ -275,12 +277,10 @@ mod_rgb_image_server <- function(input, output, session, rv){
       footer = NULL
     ))
   })
- 
 }
-    
+
 ## To be copied in the UI
 # mod_rgb_image_ui("rgb_image_ui_1")
-    
+
 ## To be copied in the server
 # callModule(mod_rgb_image_server, "rgb_image_ui_1")
- 

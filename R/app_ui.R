@@ -16,15 +16,13 @@ app_ui <- function(request) {
     # List the first level UI elements here
     # ui = tags$body(class="skin-blue sidebar-mini control-sidebar-open",
     
-    dashboardPagePlus(
-      header = dashboardHeaderPlus(
+    shinydashboardPlus::dashboardPage(
+      header = dashboardHeader(
         fixed = TRUE,
         title = tagList(
           span(class = "logo-lg", "Shiny CNES"),
           img(src = "www/cnes.svg")
-        ),
-        enable_rightsidebar = TRUE,
-        rightSidebarIcon = "bars"
+        )
       ),
       sidebar = dashboardSidebar(
         sidebarMenu(
@@ -33,7 +31,9 @@ app_ui <- function(request) {
           menuItem("Processing selection", tabName = "opt_processing", icon = icon("gears")),
           menuItem("Spectral indices selection", tabName = "index", icon = icon("calculator")),
           menuItem("RGB images selection", tabName = "rgb", icon = icon("calculator")),
-          menuItem("Processing result", tabName = "launch_processing", icon = icon("refresh")),
+          menuItem("TILES Processing", tabName = "tiles_processing", icon = icon("refresh")),
+          menuItem("SRTM Processing", tabName = "srtm_processing", icon = icon("refresh")),
+          menuItem("WorldClim Processing", tabName = "worldclim_processing", icon = icon("refresh")),
           menuItem("Prevision result", tabName = "launch_prevision", icon = icon("calendar"))
         )
       ),
@@ -69,32 +69,44 @@ app_ui <- function(request) {
           # tab 5
           tabItem(
             tabName = "rgb",
-            mod_rgb_image_ui("rgb")
+            mod_rgb_image_ui("product")
           ),
           # tab 6
           tabItem(
-            tabName = "launch_processing",
-            mod_launch_processing_ui("launch_processing")
+            tabName = "tiles_processing",
+            mod_tiles_processing_ui("product")
           ),
           # tab 7
+          tabItem(
+            tabName = "srtm_processing",
+            mod_srtm_processing_ui("product")
+          ),
+          # tab 8
+          tabItem(
+            tabName = "worldclim_processing",
+            mod_worldclim_processing_ui("product")
+          ),
+          # tab 9
           tabItem(
             tabName = "launch_prevision",
             mod_launch_prevision_ui("launch_prevision")
           )
         )
       ),
-      rightsidebar = rightSidebar(
-        background = "dark",
-        rightSidebarTabContent(
-          id = 1,
-          icon = "map-marked-alt",
-          active = TRUE,
-          mod_param_ui("product")
+      controlbar = dashboardControlbar(
+        skin = "dark",
+        collapsed = FALSE,
+        controlbarMenu(
+          id = "right_menu",
+          controlbarItem(
+            "Parameters",
+            mod_param_ui("product")
+          )
         )
       ),
       footer = dashboardFooter(
-        left_text = "By Pascal Obstetar",
-        right_text = "Dijon, 2020"
+        left = "By Pascal Obstetar",
+        right = "Dijon, 2020"
       )
     )
   )

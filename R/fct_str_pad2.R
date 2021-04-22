@@ -23,13 +23,13 @@
 #'
 #' # Longer strings are returned unchanged
 #' str_pad2("hadley", 3)
-str_pad2 <- function (string, width, side = c("left", "right", "both"), pad = " ") {
+str_pad2 <- function(string, width, side = c("left", "right", "both"), pad = " ") {
   side <- match.arg(side)
-  if (length(width)>1) {
+  if (length(width) > 1) {
     warning("'width' must be of length 1 (first element is taken).")
     width <- width[1]
   }
-  if (length(pad)>1) {
+  if (length(pad) > 1) {
     warning("'pad' must be of length 1 (first element is taken).")
     pad <- pad[1]
   }
@@ -42,7 +42,7 @@ str_pad2 <- function (string, width, side = c("left", "right", "both"), pad = " 
       } else if (side == "right") {
         c(sel_string, rep(pad, pad_length))
       } else if (side == "both") {
-        c(rep(pad, floor(pad_length/2)), sel_string, rep(pad, ceiling(pad_length/2)))
+        c(rep(pad, floor(pad_length / 2)), sel_string, rep(pad, ceiling(pad_length / 2)))
       },
       collapse = ""
     )

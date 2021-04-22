@@ -20,7 +20,7 @@ one or more within the followings:
 
 \item{pattern}{A regular expression on index names.}
 
-\item{all}{Logical: if TRUE, all the indices retrieved from 
+\item{all}{Logical: if TRUE, all the indices retrieved from
 [IDB](http://www.indexdatabase.de/db/is.php?sensor_id=96) are returned;
 if FALSE (default), only indices checked by the authors are returned.}
 }

@@ -4,15 +4,15 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
-mod_spectral_indice_ui <- function(id){
+#' @importFrom shiny NS tagList
+mod_spectral_indice_ui <- function(id) {
   ns <- NS(id)
-  
+
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
-  
+
   tagList(
     tabName = "index",
     h3(i18n$t("Select spectral indices")),
@@ -69,7 +69,7 @@ mod_spectral_indice_ui <- function(id){
                 ns("verified_indices"),
                 label = span(
                   i18n$t("Show only verified indices\u2000"),
-                  actionLink(ns("note_list_indices"), icon("warning"))
+                  actionLink(ns("note_list_indice"), icon("warning"))
                 ),
                 value = TRUE
               )
@@ -83,114 +83,120 @@ mod_spectral_indice_ui <- function(id){
     ) # end of conditionalpanel on tab_index
   ) # end taglist
 }
-    
+
 #' spectral_indice Server Function
-#' 
+#'
 #' @importFrom shiny withMathJax
 #'
-#' @noRd 
-mod_spectral_indice_server <- function(input, output, session, rv){
+#' @noRd
+mod_spectral_indice_server <- function(input, output, session, rv) {
   ns <- session$ns
-  
+
   i18n <- shiny.i18n::Translator$new(translation_json_path = "./inst/translations/translation.json")
   i18n$set_translation_language("fr")
   
+  indices_rv <- reactiveValues()
+
   # for save parameters
   observe({
     rv$index_source <- input$index_source
     rv$index_datatype <- input$index_datatype
     rv$verified_indices <- input$verified_indices
     rv$check_indices <- input$check_indices
-    rv$list_indices <- input$list_indices
+    rv$list_indice <- input$list_indice
+    indices_rv$checked <- sort(nn(input$list_indice))
+    updateTextInput(session, "list_check_indices",
+                    value = sort(nn(input$list_indice)))
   })
-  
+
   # Reactive variable: TRUE if indices are required, FALSE if not
   indices_req <- reactive({
-    !is.null(input$list_indices)
+    !is.null(rv$list_indice)
   })
-
   # convert in output value to be used in conditionalPanel
   output$indices_req <- renderText(indices_req())
-
   # options to update these values also if not visible
   outputOptions(output, "indices_req", suspendWhenHidden = FALSE)
-  
+
   # create the list indices
   create_indices_db()
-  
+
   indices_db <- data.table(list_indices(
-    c("n_index","name","longname","s2_formula_mathml","link","checked"),
+    c("n_index", "name", "longname", "s2_formula_mathml", "link", "checked"),
     all = TRUE
   ))
-  check_mark <- span(style="color:darkgreen;", icon("check"))
-  check_mark <- gsub("\n *","", as.character(check_mark))
-  
-  indices_db[,extendedname := paste0(
+
+  check_mark <- span(style = "color:darkgreen;", icon("check"))
+  check_mark <- gsub("\n *", "", as.character(check_mark))
+
+  indices_db[, extendedname := paste0(
     name,
-    " (",longname,")  ",
+    " (", longname, ")  ",
     ifelse(checked, check_mark, "")
   )]
   setkey(indices_db, "name")
-  
-  indices_rv <- reactiveValues()
-  
+
   observe({
-    indices_db_verified_idx <- if (input$verified_indices==TRUE) {
+    indices_db_verified_idx <- if (input$verified_indices == TRUE) {
       indices_db$checked
     } else {
       rep(TRUE, nrow(indices_db))
     }
     indices_rv$matches <- indices_db[
       indices_db_verified_idx &
-        grepl(tolower(input$filter_indices),
-              tolower(indices_db$extendedname)),
+        grepl(
+          tolower(input$filter_indices),
+          tolower(indices_db$extendedname)
+        ),
       name
-      ]
-    indices_rv$filtered <- indices_db[unique(c(indices_rv$checked,indices_rv$matches)),
-                                      list(name,extendedname)]
+    ]
+    indices_rv$filtered <- indices_db[
+      unique(c(indices_rv$checked, indices_rv$matches)),
+      list(name, extendedname)
+    ]
   })
   
   output$check_indices <- renderUI({
     checkboxGroupInput(
-      ns("list_indices"),
-      label = i18n$t("Indices to be exported"),
+      ns("list_indice"),
+      label = i18n$t("Indices to be calculated"),
       choiceNames = lapply(indices_rv$filtered$extendedname, HTML),
       choiceValues = as.list(indices_rv$filtered$name),
       selected = indices_rv$checked
     )
   })
-  
-  observe({
-    updateTextInput(session, "list_check_indices", value = sort(nn(input$list_indices)))
-    indices_rv$checked <- sort(nn(input$list_indices))
-  })
-  
+
   index_details <- function(index) {
     extendedname <- link <- longname <- name <- providers <- s2_formula_mathml <- NULL
     return(box(
-      width=12,
+      width = 12,
       collapsible = TRUE,
-      title=indices_db[name==index,name],
-      p(em(indices_db[name==index,longname])),
-      p(strong(i18n$t("Formula:")),
+      title = indices_db[name == index, name],
+      p(em(indices_db[name == index, longname])),
+      p(
+        strong(i18n$t("Formula:")),
         br(),
-        shiny::withMathJax(indices_db[name==index,
-                               HTML(s2_formula_mathml)])),
+        shiny::withMathJax(indices_db[
+          name == index,
+          HTML(s2_formula_mathml)
+        ])
+      ),
       p(a(i18n$t("More info"),
-          target="_blank",
-          href=indices_db[name==index,link]))
+        target = "_blank",
+        href = indices_db[name == index, link]
+      ))
     ))
   }
-  
+
   output$show_formula <- renderUI({
     column(
-      width=4,
+      width = 4,
       fluidRow(
         lapply(indices_rv$checked, index_details)
       )
     )
   })
-  
+
   observeEvent(input$help_index_source, {
     showModal(modalDialog(
       title = i18n$t("Build indices from:"),
@@ -212,8 +218,8 @@ mod_spectral_indice_server <- function(input, output, session, rv){
       footer = NULL
     ))
   })
-  
-  observeEvent(input$note_list_indices, {
+
+  observeEvent(input$note_list_indice, {
     showModal(modalDialog(
       title = i18n$t("Spectral indices"),
       HTML(
@@ -221,13 +227,14 @@ mod_spectral_indice_server <- function(input, output, session, rv){
         "<tr>",
         "<td style=\"padding-right: 10px;\">",
         as.character(
-          a(href="http://www.indexdatabase.de/db/is.php?sensor_id=96",
-            target="_blank",
+          a(
+            href = "http://www.indexdatabase.de/db/is.php?sensor_id=96",
+            target = "_blank",
             img(
-              src="http://www.indexdatabase.de/daten/grafik/logo.png",
-              alt="IDB logo",
-              height="70",
-              width="125"
+              src = "http://www.indexdatabase.de/daten/grafik/logo.png",
+              alt = "IDB logo",
+              height = "70",
+              width = "125"
             )
           )
         ),
@@ -235,7 +242,7 @@ mod_spectral_indice_server <- function(input, output, session, rv){
         "<td>",
         i18n$t("Spectral indices here listed were mostly taken from"),
         "<a href=\"http://www.indexdatabase.de\" target=\"_blank\">Index DataBase</a>.",
-        paste0(i18n$t("Indices marked as verified ("),check_mark,i18n$t(") were checked")),
+        paste0(i18n$t("Indices marked as verified ("), check_mark, i18n$t(") were checked")),
         i18n$t("in order to ensure that the formula used to compute them"),
         i18n$t("is actually the formula used by the authors, and that"),
         i18n$t("Sentinel-2 bands associated to spectral bands are correct."),
@@ -245,12 +252,10 @@ mod_spectral_indice_server <- function(input, output, session, rv){
       footer = NULL
     ))
   })
- 
 }
-    
+
 ## To be copied in the UI
 # mod_spectral_indice_ui("spectral_indice_ui_1")
-    
+
 ## To be copied in the server
 # callModule(mod_spectral_indice_server, "spectral_indice_ui_1")
- 

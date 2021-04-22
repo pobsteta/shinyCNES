@@ -1,12 +1,12 @@
 #' The application server-side
-#' 
-#' @param input,output,session Internal parameters for {shiny}. 
+#'
+#' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
-app_server <- function( input, output, session ) {
+app_server <- function(input, output, session) {
   # List the first level callModules here
-  
+
   # create reactive values
   r <- reactiveValues(
     project_name = NULL,
@@ -15,7 +15,7 @@ app_server <- function( input, output, session ) {
     s2tiles = s2_tiles(),
     s2orbits = s2_orbits()
   )
-  
+
   # tab1
   param <- callModule(mod_param_server, "product", rv = r)
   callModule(mod_temporal_map_server, "product", rv = r)
@@ -33,10 +33,13 @@ app_server <- function( input, output, session ) {
   # tab4
   callModule(mod_spectral_indice_server, "product", rv = r)
   # tab 5
-  callModule(mod_rgb_image_server, "rgb", rv = r)
+  callModule(mod_rgb_image_server, "product", rv = r)
   # tab 6
-  callModule(mod_launch_processing_server, "launch_processing", rv = r)
+  callModule(mod_tiles_processing_server, "product", rv = r)
   # tab 7
+  callModule(mod_srtm_processing_server, "product", rv = r)
+  # tab 8
+  callModule(mod_worldclim_processing_server, "product", rv = r)
+  # tab 9
   callModule(mod_launch_prevision_server, "launch_prevision", rv = r)
-
 }

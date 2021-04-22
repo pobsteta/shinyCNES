@@ -12,7 +12,7 @@
 #'  - `checked`: logical (TRUE for verified indices);
 #'  - `a`, `b`, `x`: parameter values (NA for non required parameters).
 #' @param pattern A regular expression on index names.
-#' @param all Logical: if TRUE, all the indices retrieved from 
+#' @param all Logical: if TRUE, all the indices retrieved from
 #'  [IDB](http://www.indexdatabase.de/db/is.php?sensor_id=96) are returned;
 #'  if FALSE (default), only indices checked by the authors are returned.
 #' @return A data.frame with the required information. The table contains
@@ -25,33 +25,32 @@
 #' @import data.table
 #' @author Luigi Ranghetti, phD (2019) \email{luigi@@ranghetti.info}
 #' @note License: GPL 3.0
-#' 
-list_indices <- function(values, pattern="", all=FALSE) {
-  
+#'
+list_indices <- function(values, pattern = "", all = FALSE) {
+
   # generate indices.json if missing
   create_indices_db()
-  
+
   # read indices database
-  json_path <- system.file("data-raw/indices.json", package="shinyCNES")
+  json_path <- system.file("data-raw/indices.json", package = "shinyCNES")
   indices <- jsonlite::fromJSON(json_path)
-  
+
   # select requested values from the table
-  for (sel_par in c("a","b","x")) {
+  for (sel_par in c("a", "b", "x")) {
     if (is.null(indices$indices[[sel_par]])) {
       indices$indices[[sel_par]] <- as.numeric(NA)
     }
   }
-  
-  #filter only checked indices
+
+  # filter only checked indices
   if (all == FALSE) {
-    indices$indices <- indices$indices[indices$indices$checked,]
+    indices$indices <- indices$indices[indices$indices$checked, ]
   }
-  
-  indices$indices <- indices$indices[grep(pattern,indices$indices$name),values]
+
+  indices$indices <- indices$indices[grep(pattern, indices$indices$name), values]
   attr(indices$indices, "pkg_version") <- package_version(indices$pkg_version)
   attr(indices$indices, "creation_date") <- as.POSIXct(indices$creation_date)
-  
+
   # return requested values
   return(indices$indices)
-  
 }

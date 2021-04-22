@@ -77,18 +77,84 @@ import_param_list <- function(session, rv) {
     # product ####
     setProgress(0.4)
     
-    # indices spectral ####
-    if (all(is.na(nn(rv$list_indices)))) {rv$list_indices <- character(0)}
-    updateCheckboxGroupInput(session, "list_indices", selected = rv$list_indices)
-    updateTextInput(session, "list_check_indices", value = sort(nn(rv$list_indices)))
-    # rgb images ####
-    if (all(is.na(nn(rv$list_rgbimages)))) {rv$list_rgbimages <- character(0)}
-    rv$list_rgb_ranges <- setNames(rv$rgb_ranges, rv$list_rgbimages)
-    updateCheckboxGroupInput(session, "list_rgbimages", selected = rv$list_rgbimages)
+    # list tile
+    if (all(is.na(nn(rv$list_imgtile)))) {
+      rv$list_imgtile <- character(0)
+    }
+    if (!is.null(rv$list_imgtile)) {
+      updateSelectInput(session, "listimgtile", choices = c("Choose a picture" = "", rv$list_imgtile))
+      updateTextInput(session, "list_imgtiles", value = rv$list_imgtile)
+    }
     
+    # list rgb
+    if (all(is.na(nn(rv$list_imgrgb)))) {
+      rv$list_imgrgb <- character(0)
+    }
+    if (!is.null(rv$list_imgrgb)) {
+      updateSelectInput(session, "listimgrgb", choices = c("Choose a picture" = "", rv$list_imgrgb))
+      updateTextInput(session, "list_imgrgbs", value = rv$list_imgrgb)
+    }
+    
+    # list indice
+    if (all(is.na(nn(rv$list_imgindice)))) {
+      rv$list_imgindice <- character(0)
+    }
+    if (!is.null(rv$list_imgindice)) {
+      updateSelectInput(session, "listimgindice", choices = c("Choose a picture" = "", rv$list_imgindice))
+      updateTextInput(session, "list_imgindices", value = rv$list_imgindice)
+    }
+    
+    # list srtm
+    if (all(is.na(nn(rv$list_imgsrtm)))) {
+      rv$list_imgsrtm <- character(0)
+    }
+    if (!is.null(rv$list_imgsrtm)) {
+      updateSelectInput(session, "listimgsrtm", choices = c("Choose a picture" = "", rv$list_imgsrtm))
+      updateTextInput(session, "list_imgsrtms", value = rv$list_imgsrtm)
+    }
+    
+    # list srtm simple
+    if (all(is.na(nn(rv$list_imgsrtmsimple)))) {
+      rv$list_imgsrtmsimple <- character(0)
+    }
+    if (!is.null(rv$list_imgsrtmsimple)) {
+      updateSelectInput(session, "listimgsrtmsimple", choices = c("Choose a picture" = "", rv$list_imgsrtmsimple))
+      updateTextInput(session, "list_imgsrtmsimples", value = rv$list_imgsrtmsimple)
+    }
+
+    # list srtm multiple
+    if (all(is.na(nn(rv$list_imgsrtmmultiple)))) {
+      rv$list_imgsrtmmultiple <- character(0)
+    }
+    if (!is.null(rv$list_imgsrtmmultiple)) {
+      updateSelectInput(session, "listimgsrtmmultiple", choices = c("Choose a picture" = "", rv$list_imgsrtmmultiple))
+      updateTextInput(session, "list_imgsrtmmultiples", value = rv$list_imgsrtmmultiple)
+    }
+
+    # indices spectral ####
+    if (all(is.na(nn(rv$list_indice)))) {
+      rv$list_indice <- character(0)
+    }
+    updateCheckboxGroupInput(session, "list_indice", selected = rv$list_indice)
+    
+    # rgb images ####
+    if (all(is.na(nn(rv$list_rgb)))) {
+      rv$list_rgb <- character(0)
+    }
+    rv$list_rgb_ranges <- setNames(rv$rgb_ranges, rv$list_rgb)
+    updateCheckboxGroupInput(session, "list_rgb", selected = rv$list_rgb)
+
     update_extent(extent_source = "imported", rv = rv, custom_source = rv$extent, session = session)
-    updatePickerInput(session, "tiles_checkbox", selected = if(length(nn(rv$s2tiles_selected))>0) {rv$s2tiles_selected} else {NA})
-    updatePickerInput(session, "orbits_checkbox", selected = if(length(nn(rv$s2orbits_selected))>0) {rv$s2orbits_selected} else {NA})
+    updatePickerInput(session, "tiles_checkbox", selected = if (length(nn(rv$s2tiles_selected)) > 0) {
+      rv$s2tiles_selected
+    } else {
+      NA
+    })
+    updatePickerInput(session, "orbits_checkbox", selected = if (length(nn(rv$s2orbits_selected)) > 0) {
+      rv$s2orbits_selected
+    } else {
+      NA
+    })
 
     setProgress(1)
   })
@@ -106,7 +172,6 @@ import_param_list <- function(session, rv) {
 #' @export
 #'
 create_return_list <- function(rv) {
-  
   req(rv)
   rl <- list()
 
@@ -115,7 +180,7 @@ create_return_list <- function(rv) {
   # Project directory
   rl$path_project <- rv$path_project
   # create repository if project don't exist
-  rep <- file.path(rv$path_project, rv$project_name)
+  rep <- file.path(rv$path_project)
   if (!dir.exists(rep)) {
     dir.create(rep, showWarnings = FALSE, recursive = TRUE)
   }
@@ -129,19 +194,9 @@ create_return_list <- function(rv) {
   } else {
     NA
   }
-  # path of entire tiled products
-  rl$path_tiles <- if (rl$project_name != "") {
-    res <- paste0(rep, "/projets/", rv$project_name, "/tiles")
-    if (!dir.exists(res)) {
-      dir.create(res, showWarnings = FALSE)
-    }
-    res
-  } else {
-    NA
-  }
-  # path of prediction calc
-  rl$path_pred <- if (rl$project_name != "") {
-    res <- paste0(rep, "/projets/", rv$project_name, "/pred/sdm")
+  # path of collection gdalcube db
+  rl$path_db <- if (rl$project_name != "") {
+    res <- paste0(rep, "/projets/", rv$project_name, "/db")
     if (!dir.exists(res)) {
       dir.create(res, showWarnings = FALSE, recursive = TRUE)
     }
@@ -149,29 +204,19 @@ create_return_list <- function(rv) {
   } else {
     NA
   }
-  # path of mosaic calc
-  rl$path_mosaic <- if (rl$project_name != "") {
-    res <- paste0(rep, "/mosaic")
+  # path of prediction calc
+  rl$path_pred <- if (rl$project_name != "") {
+    res <- paste0(rep, "/projets/", rv$project_name, "/pred")
     if (!dir.exists(res)) {
-      dir.create(res, showWarnings = FALSE)
+      dir.create(res, showWarnings = FALSE, recursive = TRUE)
     }
     res
   } else {
     NA
   }
-  # path of translate
-  rl$path_translate <- if (rl$project_name != "") {
-    res <- paste0(rep, "/translate")
-    if (!dir.exists(res)) {
-      dir.create(res, showWarnings = FALSE)
-    }
-    res
-  } else {
-    NA
-  }
-  # path of merged
-  rl$path_merged <- if (rl$project_name != "") {
-    res <- paste0(rep, "/projets/", rv$project_name, "/merged")
+  # path of tile
+  rl$path_tile <- if (rl$project_name != "") {
+    res <- paste0(rep, "/projets/", rv$project_name, "/tile")
     if (!dir.exists(res)) {
       dir.create(res, showWarnings = FALSE)
     }
@@ -182,26 +227,6 @@ create_return_list <- function(rv) {
   # path of tif
   rl$path_tif <- if (rl$project_name != "") {
     res <- paste0(rep, "/projets/", rv$project_name, "/tif")
-    if (!dir.exists(res)) {
-      dir.create(res, showWarnings = FALSE)
-    }
-    res
-  } else {
-    NA
-  }
-  # path of warped
-  rl$path_warped <- if (rl$project_name != "") {
-    res <- paste0(rep, "/warped")
-    if (!dir.exists(res)) {
-      dir.create(res, showWarnings = FALSE)
-    }
-    res
-  } else {
-    NA
-  }
-  # path of masked
-  rl$path_masked <- if (rl$project_name != "") {
-    res <- paste0(rep, "/masked")
     if (!dir.exists(res)) {
       dir.create(res, showWarnings = FALSE)
     }
@@ -221,11 +246,11 @@ create_return_list <- function(rv) {
   }
   # path of rgb calc
   rl$path_rgb <- if (rl$project_name != "") {
-    res <- paste0(rep, "/rgb")
-    res2 <- paste0(rep, "/projets/", rv$project_name, "/rgb/jpg")
-    if (!dir.exists(res) | !dir.exists(res2)) {
+    resi <- paste0(rep, "/rgb")
+    res <- paste0(rep, "/projets/", rv$project_name, "/rgb")
+    if (!dir.exists(res)) {
+      dir.create(resi, showWarnings = FALSE)
       dir.create(res, showWarnings = FALSE, recursive = TRUE)
-      dir.create(res2, showWarnings = FALSE, recursive = TRUE)
     }
     res
   } else {
@@ -233,11 +258,24 @@ create_return_list <- function(rv) {
   }
   # path of spectral indices
   rl$path_indices <- if (rl$project_name != "") {
-    res <- paste0(rep, "/indices")
-    res2 <- paste0(rep, "/projets/", rv$project_name, "/indices/jpg")
-    if (!dir.exists(res) | !dir.exists(res2)) {
+    resi <- paste0(rep, "/indice")
+    res <- paste0(rep, "/projets/", rv$project_name, "/indice")
+    if (!dir.exists(res)) {
+      dir.create(resi, showWarnings = FALSE)
       dir.create(res, showWarnings = FALSE, recursive = TRUE)
-      dir.create(res2, showWarnings = FALSE, recursive = TRUE)
+    }
+    res
+  } else {
+    NA
+  }
+  
+  # path of worldclim
+  rl$path_worldclim <- if (rl$project_name != "") {
+    resi <- paste0(rep, "/worldclim")
+    res <- paste0(rep, "/projets/", rv$project_name, "/worldclim")
+    if (!dir.exists(res)) {
+      dir.create(resi, showWarnings = FALSE)
+      dir.create(res, showWarnings = FALSE)
     }
     res
   } else {
@@ -321,23 +359,29 @@ create_return_list <- function(rv) {
   }
 
   # selected tile IDs
-  rl$s2tiles_selected <- if (rv$query_space == TRUE & length(nn(rv$tiles_checkbox)>0)) {
+  rl$s2tiles_selected <- if (rv$query_space == TRUE & length(nn(rv$tiles_checkbox) > 0)) {
     rv$tiles_checkbox
   } else {
     NA
   }
   # selected orbit IDs
-  rl$s2orbits_selected <- if (rv$query_space == TRUE & length(nn(rv$orbits_checkbox)>0)) {
+  rl$s2orbits_selected <- if (rv$query_space == TRUE & length(nn(rv$orbits_checkbox) > 0)) {
     rv$orbits_checkbox
   } else {
     NA
   }
-  
+
   # spectral indices and RGB images
-  rl$list_indices <- rv$list_indices
-  rl$list_rgbimages <- rv$list_rgbimages
-  rl$rgb_ranges <- setNames(rv$list_rgb_ranges[rv$list_rgbimages], NULL)
-  
+  rl$list_imgtile <- rv$list_imgtile
+  rl$list_imgrgb <- rv$list_imgrgb
+  rl$list_imgindice <- rv$list_imgindice
+  rl$list_indice <- rv$list_indice
+  rl$list_rgb <- rv$list_rgb
+  rl$list_imgsrtm <- rv$list_imgsrtm
+  rl$list_imgsrtmsimple <- rv$list_imgsrtmsimple
+  rl$list_imgsrtmmultiple <- rv$list_imgsrtmmultiple
+  rl$rgb_ranges <- setNames(rv$list_rgb_ranges[rv$list_rgb], NULL)
+
   # polygon extent
   rl$extent <- if (!is.null(rv$extent)) {
     rv$extent %>%
